@@ -202,7 +202,7 @@ void WamTeleop::updateRT() {
             case MODE_DISCONNECT:
                 disconnect_srv.call(empty);
                 mode = MODE_FREE;
-                cout << "FREE" << endl;
+                cout << "\tFREE" << endl;
                 break;
             case MODE_FREE:
                 break;
@@ -222,7 +222,7 @@ void WamTeleop::updateRT() {
                 ft.request.initialize = true;
                 joy_force_torque_base_srv.call(ft);
                 mode = MODE_BASE_UPDATE;
-                cout << "BASE FORCE UPDATE" << endl;
+                cout << "\tBASE FORCE UPDATE" << endl;
                 break;
             case MODE_BASE_UPDATE:
                 ft.request.torque.push_back(0.0);
@@ -256,7 +256,7 @@ void WamTeleop::updateRT() {
                 ft.request.initialize = true;
                 joy_force_torque_tool_srv.call(ft);
                 mode = MODE_FORCE_UPDATE;
-                cout << "TOOL FORCE UPDATE" << endl;
+                cout << "\tTOOL FORCE UPDATE" << endl;
                 break;
             case MODE_FORCE_UPDATE:
                 ft.request.torque.push_back(0.0);
@@ -302,20 +302,20 @@ void WamTeleop::updateCommand() {
             case BUTTON_A:
                 grasp = !grasp;
                 if (grasp) {
-                    cout << "calling grasp open" << endl;
+                    cout << "\t\tcalling grasp open" << endl;
                     grasp_open_srv.call(empty);
                 } else {
-                    cout << "calling grasp close" << endl;
+                    cout << "\t\tcalling grasp close" << endl;
                     grasp_close_srv.call(empty);
                 }
                 break;
             case BUTTON_B:
                 spread = !spread;
                 if (spread) {
-                    cout << "calling spread open" << endl;
+                    cout << "\t\tcalling spread open" << endl;
                     spread_open_srv.call(empty);
                 } else {
-                    cout << "calling spread close" << endl;
+                    cout << "\t\tcalling spread close" << endl;
                     spread_close_srv.call(empty);
                 }
                 break;
@@ -330,40 +330,40 @@ void WamTeleop::updateCommand() {
                         // cout << "MODE_DISCONNECT" << endl;
                         break;
                     case MODE_FREE:
-                        cout << "FREE" << endl;
+                        cout << "\tFREE" << endl;
                         break;
                     case MODE_BASE_CONNECT:
                         // cout << "MODE_BASE_CONNECT" << endl;
                         break;
                     case MODE_BASE_UPDATE:
-                        cout << "BASE FORCE UPDATE" << endl;
+                        cout << "\tBASE FORCE UPDATE" << endl;
                         break;      
                     case MODE_TOOL_CONNECT:
                         // cout << "MODE_TOOL_CONNECT" << endl;
                         break;
                     case MODE_FORCE_UPDATE:
-                        cout << "TOOL FORCE UPDATE" << endl;
+                        cout << "\tTOOL FORCE UPDATE" << endl;
                         break;
                     case MODE_TORQUE_UPDATE:
-                        cout << "TOOL TORQUE UPDATE" << endl;          
+                        cout << "\tTOOL TORQUE UPDATE" << endl;          
                         break;
                 }
                 break;
             case BUTTON_RB:
                 lock_joints = !lock_joints;
-                cout << "joints locked: " << boolalpha << lock_joints << endl;
+                cout << "\t\tjoints locked: " << boolalpha << lock_joints << endl;
                 hold.request.hold = lock_joints;
                 hold_srv.call(hold); 
                 break;            
             case BUTTON_BACK:
                 disconnect_srv.call(empty);
                 mode = MODE_FREE;
-                cout << "calling go home" << endl;
+                cout << "\t\tcalling go home" << endl;
                 go_home_srv.call(empty); 
                 lock_joints = true;
                 break;
             case BUTTON_START:
-                cout << "initializing hand and setting velocities to 16" << endl;
+                cout << "\t\tinitializing hand and setting velocities to 16" << endl;
                 bhand_init_srv.call(empty);
                 spread_vel.request.velocity = 16;
                 spread_vel_srv.call(spread_vel);
@@ -393,6 +393,19 @@ int main(int argc, char** argv)
 
     ros::Rate pub_rate(CNTRL_FREQ); // Setting the publishing rate to CNTRL_FREQ (50Hz by default)
     // Looping at the specified frequency while our ros node is ok
+    cout << "******************************************************************" << endl;
+    cout << "* WAM Teleoperation Node with the Logitech Controller            *" << endl;
+    cout << "******************************************************************" << endl;
+    cout << "* LB BUTTON:     Mode Switch                                     *" << endl;
+    cout << "* RB BUTTON:     Toggle Hold Joints                              *" << endl;
+    cout << "* START BUTTON:  Initialize Hand                                 *" << endl;
+    cout << "* BACK BUTTON:   Go Home                                         *" << endl;
+    cout << "* A BUTTON:      Toggle Grasp                                    *" << endl;
+    cout << "* B BUTTON:      Toggle Spread                                   *" << endl;
+    cout << "* LEFT STICK:    X & Y Axis Motion                               *" << endl;
+    cout << "* RIGHT STICK:   Z Axis Motion                                   *" << endl;
+    cout << "******************************************************************" << endl;
+    cout << "Current Mode:" << endl;
     while (wam_teleop.n_.ok()) {
         ros::spinOnce();
         wam_teleop.updateCommand();
